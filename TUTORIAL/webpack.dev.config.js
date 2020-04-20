@@ -1,17 +1,26 @@
 const path = require('path');
-const TerserPlugin = require('terser-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+
 module.exports = {
-    entry: './src/index.js',
+    entry: {
+        'hello-world': './src/index.js',
+        'webpack': './src/webpackScript.js'
+    },
     output: {
         path: path.resolve(__dirname, 'dist'),
         publicPath: '',
-        filename: 'bundle.[contenthash].js' 
+        filename: 'bundle.js' 
     },
-    mode: 'none',
+    mode: 'development',
+    devServer: {
+        contentBase: path.resolve(__dirname, 'dist'),
+        index: 'index.html',
+        port: 9000,
+        watchContentBase: true,
+        open: true
+    },
     module: {
         rules: [
             {
@@ -23,13 +32,13 @@ module.exports = {
             {
                 test: /\.css$/,
                 use: [
-                    MiniCssExtractPlugin.loader, 'css-loader'
+                    'style-loader', 'css-loader'
                 ]
             },
             {
                 test: /\.scss$/,
                 use: [
-                    MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'
+                    'style-loader', 'css-loader', 'sass-loader'
                 ]
             },
             {
@@ -52,15 +61,19 @@ module.exports = {
         ]
     },
     plugins: [
-        new TerserPlugin(),
-        new MiniCssExtractPlugin({
-            filename: 'styles.[contenthash].css',
-        }),
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             title: 'Hello world',
+            chunks: ['hello-world'],
             template: 'src/views/index.hbs',
             description: 'Some description'
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'webpackPage.html',
+            title: 'Webpack Page',
+            chunks: ['webpack'],
+            template: 'src/views/webpackPage.hbs',
+            description: 'Imágen WebPack'
         }),
     ]
 };
